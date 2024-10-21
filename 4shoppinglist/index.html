@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngularJS Shopping List</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-app="shoppingApp" ng-controller="ShoppingListController">
+
+    <h1>Shopping List</h1>
+
+    <!-- Input field to add new item -->
+    <input type="text" ng-model="newItem" placeholder="Add new item" />
+    <button ng-click="addItem()">Add Item</button>
+
+    <!-- Display the list of items -->
+    <ul>
+        <li ng-repeat="item in shoppingList">
+            {{ item }}
+            <button ng-click="removeItem($index)">Remove</button>
+        </li>
+    </ul>
+
+    <!-- Show message if the list is empty -->
+    <p ng-if="shoppingList.length === 0">Your shopping list is empty.</p>
+
+    <script>
+        // Define AngularJS application module
+        var app = angular.module('shoppingApp', []);
+
+        // Define the controller
+        app.controller('ShoppingListController', function($scope) {
+            // Initialize shopping list array
+            $scope.shoppingList = [];
+
+            // Add item to the list
+            $scope.addItem = function() {
+                if ($scope.newItem) {
+                    $scope.shoppingList.push($scope.newItem);
+                    $scope.newItem = "";  // Clear input field
+                }
+            };
+
+            // Remove item from the list
+            $scope.removeItem = function(index) {
+                $scope.shoppingList.splice(index, 1);
+            };
+        });
+    </script>
+</body>
+</html>

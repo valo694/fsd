@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngularJS Cart Application</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body ng-app="cartApp" ng-controller="CartController">
+
+    <h1>Shopping Cart</h1>
+
+    <!-- Products Listing -->
+    <h2>Products</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+        <tr ng-repeat="product in products">
+            <td>{{ product.name }}</td>
+            <td>${{ product.price }}</td>
+            <td><button ng-click="addToCart(product)">Add to Cart</button></td>
+        </tr>
+    </table>
+
+    <!-- Cart Items -->
+    <h2>Your Cart</h2>
+    <table ng-if="cart.length > 0">
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
+        <tr ng-repeat="item in cart">
+            <td>{{ item.name }}</td>
+            <td>
+                <input type="number" ng-model="item.quantity" min="1" ng-change="updateCart()" />
+            </td>
+            <td>${{ item.price }}</td>
+            <td>${{ item.price * item.quantity }}</td>
+            <td><button ng-click="removeFromCart(item)">Remove</button></td>
+        </tr>
+    </table>
+
+    <!-- Empty Cart Message -->
+    <p ng-if="cart.length === 0">Your cart is empty.</p>
+
+    <!-- Cart Total -->
+    <h3 ng-if="cart.length > 0">Total: ${{ calculateTotal() }}</h3>
+
+    <script>
+        // Define the AngularJS app
+        var app = angular.module('cartApp', []);
+
+        // Define the CartController
+        app.controller('CartController', function($scope) {
+            // List of available products
+            $scope.products = [
+                { name: 'Laptop', price: 1200 },
+                { name: 'Phone', price: 800 },
+                { name: 'Tablet', price: 400 }
+            ];
+
+            // Cart array to hold selected products
+            $scope.cart = [];
+
+            // Function to add item to the cart
+            $scope.addToCart = function(product) {
+                var found = false;
+                // Check if product is already in the cart, increase quantity if found
+                for (var i = 0; i < $scope.cart.length; i++) {
+                    if ($scope.cart[i].name === product.name) {
+                        $scope.cart[i].quantity++;
+                        found = true;
+                        break;
+                    }
+                }
+                // If not found, add new item to the cart
+                if (!found) {
+                    $scope.cart.push({
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1
+                    });
+                }
+            };
+
+            // Function to remove an item from the cart
+            $scope.removeFromCart = function(item) {
+                var index = $scope.cart.indexOf(item);
+                if (index !== -1) {
+                    $scope.cart.splice(index, 1);
+                }
+            };
+
+            // Function to calculate the total cost of the cart
+            $scope.calculateTotal = function() {
+                var total = 0;
+                for (var i = 0; i < $scope.cart.length; i++) {
+                    total += $scope.cart[i].price * $scope.cart[i].quantity;
+                }
+                return total;
+            };
+
+            // Function to update the cart when quantity changes
+            $scope.updateCart = function() {
+                // (Optional) You can add logic here if needed, but Angular automatically updates the view.
+            };
+        });
+    </script>
+</body>
+</html>
