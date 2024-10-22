@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Chat</title>
+    <style>
+        #chat {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 300px;
+            overflow-y: scroll;
+        }
+        #chat li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-time Chat Application</h1>
+    <ul id="chat"></ul>
+    <form id="chatForm">
+        <input type="text" id="username" placeholder="Enter your name" required>
+        <input type="text" id="messageInput" placeholder="Enter your message" required>
+        <button type="submit">Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Elements
+        const chatForm = document.getElementById('chatForm');
+        const chatList = document.getElementById('chat');
+        const messageInput = document.getElementById('messageInput');
+        const usernameInput = document.getElementById('username');
+
+        // Receive and display previous messages
+        socket.on('previousMessages', (messages) => {
+            messages.forEach((message) => {
+                displayMessage(message);
+            });
+        });
+
+        // Listen for new messages from the server
+        socket.on('message', (message) => {
+            displayMessage(message);
+        });
+
+        // Handle new message submission
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = usernameInput.value;
+            const message = messageInput.value;
+
+            if (message && username) {
+                // Send the message to the server
+                socket.emit('chatMessage', {
+                    username,
+                    message
+                });
+
+                messageInput.value = ''; // Clear input field
+            }
+        });
+
+        // Display message in chat
+        function displayMessage(message) {
+            const li = document.createElement('li');
+            li.innerText = `${message.username}: ${message.message}`;
+            chatList.appendChild(li);
+            chatList.scrollTop = chatList.scrollHeight; // Auto scroll to the bottom
+        }
+    </script>
+</body>
+</html>
